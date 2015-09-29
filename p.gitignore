@@ -1,0 +1,6 @@
+# py compiled object files 
+*.pyc 
+
+# csv version data files 
+*.csv 
+

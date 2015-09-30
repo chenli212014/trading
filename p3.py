@@ -14,7 +14,7 @@ class portfolio(object):
 	def __init__(self, name): 
 		self.name = name; 
 		self.localize_portfolio(); 
-		self.localize_action(); 
+		#self.localize_action(); 
 
 	def localize_portfolio(self): 	
 
@@ -128,9 +128,10 @@ class portfolio_information(portfolio):
 		self.action_file = action_file; 
 
 	def read_csv(self, file_name, delimiters, segmenter=RE.split): 
-		handle = open(file_name, 'r'); 
-		self.csv_lines = (segmenter(delimiters, line.strip()) for line in  handle.readlines()); 
-		handle.close(); 
+		#handle = open(file_name, 'r'); 
+		with open(file_name, 'r') as handle:  
+			self.csv_lines = (segmenter(delimiters, line.strip()) for line in  handle.readlines()); 
+		#handle.close(); 
 
 	def parse_portfolio(self, csv_lines): 
 		self.portfolio = {}; 

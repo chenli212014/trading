@@ -1,12 +1,10 @@
 #!/usr/bin/python 
 
 import p1; 
+import global_elems as G; 
 
 from p1 import sys as S; 
 from p1 import re as RE; 
-
-globals()['regex_ip'] = RE.compile(r'^([0-9]{1,3}\.){3}[0-9]{1,3}$'); 
-globals()['regex_port'] = RE.compile(r'^[0-9]{5}$'); 
 
 def locate_netelem(netlines, pattern): 
 	located = []; 
@@ -27,10 +25,10 @@ def check_netstat(ip, port):
 		print '.'.join(map(str, ip)), "expected", calc_port, "found", port;  
 
 def parse_p2(file_name): 
-	port_pattern = pattern_gen(regex_port); 
+	port_pattern = pattern_gen(G.regex_port); 
 	netlines = list(p1.read_file(S.argv[1], ';|\ |\='));  
-	ips = locate_netelem(netlines, pattern_gen(regex_ip)); 
-	ports = locate_netelem(netlines, pattern_gen(regex_port));
+	ips = locate_netelem(netlines, pattern_gen(G.regex_ip)); 
+	ports = locate_netelem(netlines, pattern_gen(G.regex_port));
 	for i in range(0, len(ips), 1): 
 		check_netstat(map(int, RE.split('\.', ips[i])), ports[i]); 
 

@@ -1,8 +1,7 @@
 #!/usr/bin/python 
 
 import sys, re, itertools; 
-
-globals()['regex_ticker'] = re.compile(r'^[A-Z]{1,4}$'); 
+import global_elems as G; 
 
 def read_file(file_name, delimiters, selection_mech=lambda x : x): 
 	handle = open(file_name, 'r'); 
@@ -14,7 +13,7 @@ def ticker_gen():
 	def selector(sym_list): 
 		processed = []; 
 		for sym in sym_list: 
-			processed.append(sym if regex_ticker.match(sym) else ' '); 	
+			processed.append(sym if G.regex_ticker.match(sym) else ' '); 	
 		return processed; 
 	return selector;  
 

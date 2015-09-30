@@ -1,6 +1,7 @@
 #!/usr/bin/python 
 
 import p1; 
+import globals as G; 
 
 from p1 import sys as S; 
 from p1 import re as RE; 
@@ -12,41 +13,26 @@ class portfolio(object):
 
 	def __init__(self, name): 
 		self.name = name; 
-		self.globalize_portfolio(); 
-		self.globalize_action(); 
+		self.localize_portfolio(); 
+		self.localize_action(); 
 
-	def globalize_portfolio(self): 	
-		globals()['sym'] = "Symbol"; 
-		globals()['dsc'] = "Description"; 
-		globals()['nat'] = "Country"; 
-		globals()['cnt'] = "Shares"; 
-		globals()['prc'] = "Price"; 
-		globals()['crr'] = "Currency";
-		globals()['cap'] = "Total Value"; 
+	def localize_portfolio(self): 	
 
 		locale.setlocale( locale.LC_ALL, 'en_US.UTF-8' ); 
-		globals()['sregex_dq'] = RE.compile(r'\"'); 
 
-	def globalize_action(self): 
-		globals()['day'] = "Day"
-		globals()['act'] = "Corporate Action"; 
-		globals()['date_keys'] = ["month", "date", "year"]; 
-
-		globals()['div'] = "dividend"; 
-		globals()['spl'] = "split"; 
-		globals()['chg'] = "change"; 
+	#def localize_action(self): 
 
 	class portfolio_corp: 
 		
 		def __init__(self, kvars): 
 			#print kvars; 
-			self.symbol = kvars[sym]; 
-			self.description = kvars[dsc]; 
-			self.country = kvars[nat]; 
-			self.shares = int(kvars[cnt]); 
-			self.price = self.share_price(kvars[prc]); 
-			self.currency = kvars[crr]; 
-			self.value = self.capitalization(kvars[cap]); 
+			self.symbol = kvars[G.sym]; 
+			self.description = kvars[G.dsc]; 
+			self.country = kvars[G.nat]; 
+			self.shares = int(kvars[G.cnt]); 
+			self.price = self.share_price(kvars[G.prc]); 
+			self.currency = kvars[G.crr]; 
+			self.value = self.capitalization(kvars[G.cap]); 
 
 		def show(self): 
 			return ','.join([self.symbol, self.description, self.country, \
@@ -73,7 +59,7 @@ class portfolio(object):
 
 			def __init__(self, value_string): 
 				super(portfolio.portfolio_corp.capitalization, self).__init__(value_string); 
-				self.value = locale.atof(sregex_dq.sub("", value_string));  
+				self.value = locale.atof(G.sregex_dq.sub("", value_string));  
 
 			def update(self, fval): 
 				self.value = fval; 
@@ -81,9 +67,9 @@ class portfolio(object):
 				self.value_string = '"'+locale.format("%(size).2f", a, grouping=True)+'"'; 
 
 		def change(self, key, new_val): 
-			if (key == sym): 
+			if (key == G.sym): 
 				self.symbol = new_val; 
-			elif (key == dsc): 
+			elif (key == G.dsc): 
 				self.description = new_val; 
 			else: print "Unknown Change Type:", key; sys.exit(0); 
 
@@ -105,30 +91,31 @@ class portfolio(object):
 		def analyze_action(self): 
 			[atype, adesc] = self.description.split('-'); 
 			ttokens = atype.replace('"', '').strip().split(); 
-			if (div in ttokens): 
-				self.type = div; 
+			if (G.div in ttokens): 
+				self.type = G.div; 
 				self.amount = float(RE.split('\ |\/', adesc.strip().replace('"', ''))[0]); 
 				#print div, self.amount, atype, adesc; 
-			elif (spl in ttokens): 
-				self.type = spl; 
+			elif (G.spl in ttokens): 
+				self.type = G.spl; 
 				self.denom = float(adesc.strip().split()[0]);
 				self.numer = float(adesc.strip().split()[2]); 
 				#print spl, self.denom, self.numer, adesc; 
-			elif (chg in ttokens): 
-				self.type = chg; 
-				if (sym in ttokens): 
-					self.key = sym; 
+			elif (G.chg in ttokens): 
+				self.type = G.chg; 
+				if (G.sym in ttokens): 
+					self.key = G.sym; 
 				elif ("Name" in ttokens): 
-					self.key = dsc; 
+					self.key = G.dsc; 
 				else: print "unknown change elem:", atype; S.exit(1); 
 				self.val = (adesc.strip().split()[-1]).replace('"', ''); 
-				#print chg, self.key, self.val; 
+				#print G.chg, self.key, self.val; 
 			else: print "unknown action type", self.description; S.exit(1); 
 
 		class date: 
 			
 			def __init__(self, date_string): 
-				self.date_info = dict(zip(date_keys, date_string.strip().split('/'))); 
+				self.date_info = dict(zip(G.date_keys, \
+					date_string.strip().split('/'))); 
 
 			def show(self): 
 				return '/'.join(self.date_info.values()); 
@@ -214,11 +201,11 @@ class portfolio_manager(portfolio_information):
 
 	def update_portfolio(self, date): 
 		for action in self.actions[date]: 
-			if (action.type == div): 
+			if (action.type == G.div): 
 				self.portfolio[action.symbol].dividend(action.amount); 
-			elif (action.type == spl): 
+			elif (action.type == G.spl): 
 				self.portfolio[action.symbol].share_split(action.denom, action.numer); 
-			elif (action.type == chg): 
+			elif (action.type == G.chg): 
 				self.portfolio[action.symbol].change(action.key, action.val); 
 
 	def perform_actions(self): 
@@ -234,4 +221,4 @@ if __name__ == "__main__":
 		pfm.perform_actions(); 
 	else: 
 		print """\n\t\tIncorrect number of parameters: \n
-		Necessary Arguments: portfolio_file_name, actions_file_name; """ 
+		G.Necessary Arguments: portfolio_file_name, actions_file_name; """ 
